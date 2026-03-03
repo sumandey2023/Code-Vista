@@ -1,13 +1,16 @@
 import express from "express";
 import { ENV } from "./lib/env.js";
 import { serve } from "inngest/express";
+import { clerkMiddleware } from "@clerk/express";
 import cors from "cors";
 import { connectDB } from "./db/db.js";
 import { inngest, functions } from "./lib/inngest.js";
+import chatRoutes from "./routes/chatRoutes.js";
 
 const app = express();
 const PORT = ENV.PORT || 3000;
-
+// this add req.auth and req.session to the request object, allowing us to access the authenticated user's information in our routes and functions
+app.use(clerkMiddleware());
 app.use(express.json());
 app.use(
   cors({
@@ -16,6 +19,7 @@ app.use(
   }),
 );
 app.use("/api/inngest", serve({ client: inngest, functions }));
+app.use("/api/chat", chatRoutes);
 
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok" });
