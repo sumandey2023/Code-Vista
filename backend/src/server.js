@@ -6,6 +6,7 @@ import cors from "cors";
 import { connectDB } from "./db/db.js";
 import { inngest, functions } from "./lib/inngest.js";
 import chatRoutes from "./routes/chatRoutes.js";
+import sessionRoutes from "./routes/sessionRoutes.js";
 
 const app = express();
 const PORT = ENV.PORT || 3000;
@@ -20,6 +21,7 @@ app.use(
 );
 app.use("/api/inngest", serve({ client: inngest, functions }));
 app.use("/api/chat", chatRoutes);
+app.use("/api/session", sessionRoutes);
 
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok" });
