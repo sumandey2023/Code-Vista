@@ -1,26 +1,13 @@
-import {
-  SignedOut,
-  SignedIn,
-  SignInButton,
-  UserButton,
-  SignOutButton,
-} from "@clerk/clerk-react";
-import React from "react";
+import { Toaster } from "react-hot-toast";
+import Router from "./Router";
 
 const App = () => {
+  // const { isSignedIn } = useAuth();
+
   return (
     <>
-      <h1>Welcome to Code Vista</h1>
-      <SignedOut>
-        <SignInButton mode="modal">
-          <button>Sign up</button>
-        </SignInButton>
-      </SignedOut>
-
-      <SignedIn>
-        {/* <SignOutButton /> */}
-        <UserButton />
-      </SignedIn>
+      <Router />
+      <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
     </>
   );
 };
