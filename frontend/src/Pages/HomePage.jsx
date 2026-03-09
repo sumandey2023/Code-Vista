@@ -1,25 +1,15 @@
-import {
-  SignedOut,
-  SignedIn,
-  SignInButton,
-  UserButton,
-  SignOutButton,
-} from "@clerk/clerk-react";
+import NavBar from "../components/NavBar";
+import Hero from "../components/Hero";
+import FeaturedSection from "../components/FeaturedSection";
 
 const HomePage = () => {
   return (
     <>
-      <h1>Welcome to Code Vista</h1>
-      <SignedOut>
-        <SignInButton mode="modal">
-          <button>Sign up</button>
-        </SignInButton>
-      </SignedOut>
-
-      <SignedIn>
-        {/* <SignOutButton /> */}
-        <UserButton />
-      </SignedIn>
+      <div className="bg-gradient-to-br from-base-100 via-base-200 to-base-300">
+        <NavBar />
+        <Hero />
+        <FeaturedSection />
+      </div>
     </>
   );
 };
