@@ -1,9 +1,11 @@
-import React from 'react'
+import MainNav from "../components/MainNav";
 
 const Dashboard = () => {
   return (
-    <div>Dashboard</div>
-  )
-}
+    <div className="min-h-screen bg-base-200">
+      <MainNav />
+    </div>
+  );
+};
 
-export default Dashboard
+export default Dashboard;
