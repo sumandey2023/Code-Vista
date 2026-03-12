@@ -1,9 +1,10 @@
 import { Routes, Route, Navigate } from "react-router";
 import HomePage from "./Pages/HomePage";
-import ProblemPage from "./Pages/ProblemPage";
+import ProblemsPage from "./Pages/ProblemsPage";
 import { useAuth } from "@clerk/clerk-react";
 import Loader from "./components/Loader";
 import Dashboard from "./Pages/Dashboard";
+import ProblemPage from "./Pages/ProblemPage";
 
 const Router = () => {
   const { isSignedIn, isLoaded } = useAuth();
@@ -23,6 +24,10 @@ const Router = () => {
       />
       <Route
         path="/problems"
+        element={isSignedIn ? <ProblemsPage /> : <Navigate to={"/"} />}
+      />
+      <Route
+        path="/problem/:id"
         element={isSignedIn ? <ProblemPage /> : <Navigate to={"/"} />}
       />
     </Routes>
