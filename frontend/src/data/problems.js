@@ -35,7 +35,7 @@ export const PROBLEMS = {
     starterCode: {
       javascript: `function twoSum(nums, target) {
   // Write your solution here
-  
+
 }
 
 // Test cases
@@ -52,13 +52,13 @@ print(twoSum([3, 2, 4], 6))  # Expected: [1, 2]
 print(twoSum([3, 3], 6))  # Expected: [0, 1]`,
       java: `import java.util.*;
 
-class Solution {
+class Main {
     public static int[] twoSum(int[] nums, int target) {
         // Write your solution here
-        
+
         return new int[0];
     }
-    
+
     public static void main(String[] args) {
         System.out.println(Arrays.toString(twoSum(new int[]{2, 7, 11, 15}, 9))); // Expected: [0, 1]
         System.out.println(Arrays.toString(twoSum(new int[]{3, 2, 4}, 6))); // Expected: [1, 2]
@@ -96,7 +96,7 @@ class Solution {
     starterCode: {
       javascript: `function reverseString(s) {
   // Write your solution here
-  
+
 }
 
 // Test cases
@@ -121,17 +121,17 @@ reverseString(test2)
 print(test2)  # Expected: ["h","a","n","n","a","H"]`,
       java: `import java.util.*;
 
-class Solution {
+class Main {
     public static void reverseString(char[] s) {
         // Write your solution here
-        
+
     }
-    
+
     public static void main(String[] args) {
         char[] test1 = {'h','e','l','l','o'};
         reverseString(test1);
         System.out.println(Arrays.toString(test1)); // Expected: [o, l, l, e, h]
-        
+
         char[] test2 = {'H','a','n','n','a','h'};
         reverseString(test2);
         System.out.println(Arrays.toString(test2)); // Expected: [h, a, n, n, a, H]
@@ -176,7 +176,7 @@ class Solution {
     starterCode: {
       javascript: `function isPalindrome(s) {
   // Write your solution here
-  
+
 }
 
 // Test cases
@@ -191,13 +191,13 @@ console.log(isPalindrome(" ")); // Expected: true`,
 print(isPalindrome("A man, a plan, a canal: Panama"))  # Expected: True
 print(isPalindrome("race a car"))  # Expected: False
 print(isPalindrome(" "))  # Expected: True`,
-      java: `class Solution {
+      java: `class Main {
     public static boolean isPalindrome(String s) {
         // Write your solution here
-        
+
         return false;
     }
-    
+
     public static void main(String[] args) {
         System.out.println(isPalindrome("A man, a plan, a canal: Panama")); // Expected: true
         System.out.println(isPalindrome("race a car")); // Expected: false
@@ -242,7 +242,7 @@ print(isPalindrome(" "))  # Expected: True`,
     starterCode: {
       javascript: `function maxSubArray(nums) {
   // Write your solution here
-  
+
 }
 
 // Test cases
@@ -257,13 +257,13 @@ console.log(maxSubArray([5,4,-1,7,8])); // Expected: 23`,
 print(maxSubArray([-2,1,-3,4,-1,2,1,-5,4]))  # Expected: 6
 print(maxSubArray([1]))  # Expected: 1
 print(maxSubArray([5,4,-1,7,8]))  # Expected: 23`,
-      java: `class Solution {
+      java: `class Main {
     public static int maxSubArray(int[] nums) {
         // Write your solution here
-        
+
         return 0;
     }
-    
+
     public static void main(String[] args) {
         System.out.println(maxSubArray(new int[]{-2,1,-3,4,-1,2,1,-5,4})); // Expected: 6
         System.out.println(maxSubArray(new int[]{1})); // Expected: 1
@@ -307,7 +307,7 @@ print(maxSubArray([5,4,-1,7,8]))  # Expected: 23`,
     starterCode: {
       javascript: `function maxArea(height) {
   // Write your solution here
-  
+
 }
 
 // Test cases
@@ -320,13 +320,13 @@ console.log(maxArea([1,1])); // Expected: 1`,
 # Test cases
 print(maxArea([1,8,6,2,5,4,8,3,7]))  # Expected: 49
 print(maxArea([1,1]))  # Expected: 1`,
-      java: `class Solution {
+      java: `class Main {
     public static int maxArea(int[] height) {
         // Write your solution here
-        
+
         return 0;
     }
-    
+
     public static void main(String[] args) {
         System.out.println(maxArea(new int[]{1,8,6,2,5,4,8,3,7})); // Expected: 49
         System.out.println(maxArea(new int[]{1,1})); // Expected: 1
@@ -340,6 +340,194 @@ print(maxArea([1,1]))  # Expected: 1`,
     },
   },
 };
+
+// export const PROBLEMS = {
+//   "two-sum": {
+//     id: "two-sum",
+//     title: "Two Sum",
+//     difficulty: "Easy",
+//     category: "Array • Hash Table",
+//     description: {
+//       text: "Given an array of integers nums and an integer target, return indices of the two numbers in the array such that they add up to target.",
+//       notes: [
+//         "You may assume that each input would have exactly one solution, and you may not use the same element twice.",
+//         "You can return the answer in any order.",
+//       ],
+//     },
+//     examples: [
+//       {
+//         input: "nums = [2,7,11,15], target = 9",
+//         output: "[0,1]",
+//         explanation: "Because nums[0] + nums[1] == 9, we return [0, 1].",
+//       },
+//       {
+//         input: "nums = [3,2,4], target = 6",
+//         output: "[1,2]",
+//       },
+//       {
+//         input: "nums = [3,3], target = 6",
+//         output: "[0,1]",
+//       },
+//     ],
+//     constraints: [
+//       "2 ≤ nums.length ≤ 10⁴",
+//       "-10⁹ ≤ nums[i] ≤ 10⁹",
+//       "-10⁹ ≤ target ≤ 10⁹",
+//       "Only one valid answer exists",
+//     ],
+//     starterCode: {
+//       javascript: `function twoSum(nums, target) {
+//   // Write your solution here
+  
+// }
+
+// // Test cases
+// console.log(twoSum([2, 7, 11, 15], 9)); // Expected: [0, 1]
+// console.log(twoSum([3, 2, 4], 6)); // Expected: [1, 2]
+// console.log(twoSum([3, 3], 6)); // Expected: [0, 1]`,
+
+//       python: `def twoSum(nums, target):
+//     # Write your solution here
+//     pass
+
+// # Test cases
+// print(twoSum([2, 7, 11, 15], 9))
+// print(twoSum([3, 2, 4], 6))
+// print(twoSum([3, 3], 6))`,
+
+//       java: `import java.util.*;
+
+// public class Main {
+
+//     public static int[] twoSum(int[] nums, int target) {
+//         // Write your solution here
+//         return new int[0];
+//     }
+
+//     public static void main(String[] args) {
+//         System.out.println(Arrays.toString(twoSum(new int[]{2,7,11,15},9)));
+//         System.out.println(Arrays.toString(twoSum(new int[]{3,2,4},6)));
+//         System.out.println(Arrays.toString(twoSum(new int[]{3,3},6)));
+//     }
+// }`,
+//     },
+
+//     expectedOutput: {
+//       javascript: "[0,1]\n[1,2]\n[0,1]",
+//       python: "[0, 1]\n[1, 2]\n[0, 1]",
+//       java: "[0, 1]\n[1, 2]\n[0, 1]",
+//     },
+//   },
+
+//   "reverse-string": {
+//     id: "reverse-string",
+//     title: "Reverse String",
+//     difficulty: "Easy",
+//     category: "String • Two Pointers",
+//     description: {
+//       text: "Write a function that reverses a string. The input string is given as an array of characters s.",
+//       notes: [
+//         "You must do this by modifying the input array in-place with O(1) extra memory.",
+//       ],
+//     },
+
+//     starterCode: {
+//       javascript: `function reverseString(s) {
+//   // Write your solution here
+// }
+
+// // Test cases
+// let test1 = ["h","e","l","l","o"];
+// reverseString(test1);
+// console.log(test1);
+
+// let test2 = ["H","a","n","n","a","h"];
+// reverseString(test2);
+// console.log(test2);`,
+
+//       python: `def reverseString(s):
+//     pass
+
+// test1 = ["h","e","l","l","o"]
+// reverseString(test1)
+// print(test1)
+
+// test2 = ["H","a","n","n","a","h"]
+// reverseString(test2)
+// print(test2)`,
+
+//       java: `import java.util.*;
+
+// public class Main {
+
+//     public static void reverseString(char[] s) {
+//         // Write your solution here
+//     }
+
+//     public static void main(String[] args) {
+
+//         char[] test1 = {'h','e','l','l','o'};
+//         reverseString(test1);
+//         System.out.println(Arrays.toString(test1));
+
+//         char[] test2 = {'H','a','n','n','a','h'};
+//         reverseString(test2);
+//         System.out.println(Arrays.toString(test2));
+//     }
+// }`,
+//     },
+
+//     expectedOutput: {
+//       javascript: '["o","l","l","e","h"]\n["h","a","n","n","a","H"]',
+//       python: "['o', 'l', 'l', 'e', 'h']\n['h', 'a', 'n', 'n', 'a', 'H']",
+//       java: "[o, l, l, e, h]\n[h, a, n, n, a, H]",
+//     },
+//   },
+
+//   "valid-palindrome": {
+//     id: "valid-palindrome",
+//     title: "Valid Palindrome",
+//     difficulty: "Easy",
+//     category: "String • Two Pointers",
+
+//     starterCode: {
+//       javascript: `function isPalindrome(s) {
+//   // Write your solution here
+// }
+
+// console.log(isPalindrome("A man, a plan, a canal: Panama"));
+// console.log(isPalindrome("race a car"));
+// console.log(isPalindrome(" "));`,
+
+//       python: `def isPalindrome(s):
+//     pass
+
+// print(isPalindrome("A man, a plan, a canal: Panama"))
+// print(isPalindrome("race a car"))
+// print(isPalindrome(" "))`,
+
+//       java: `public class Main {
+
+//     public static boolean isPalindrome(String s) {
+//         // Write your solution here
+//         return false;
+//     }
+
+//     public static void main(String[] args) {
+//         System.out.println(isPalindrome("A man, a plan, a canal: Panama"));
+//         System.out.println(isPalindrome("race a car"));
+//         System.out.println(isPalindrome(" "));
+//     }
+// }`,
+//     },
+
+//     expectedOutput: {
+//       javascript: "true\nfalse\ntrue",
+//       python: "True\nFalse\nTrue",
+//       java: "true\nfalse\ntrue",
+//     },
+//   },
+// };
 
 export const LANGUAGE_CONFIG = {
   javascript: {
