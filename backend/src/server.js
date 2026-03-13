@@ -27,6 +27,10 @@ app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok" });
 });
 
+app.get("/", (req, res) => {
+  res.send("Code Vista API running");
+});
+
 const startServer = async () => {
   try {
     await connectDB();
