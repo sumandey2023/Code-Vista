@@ -39,6 +39,7 @@ const startServer = async () => {
     });
   } catch (error) {
     console.error("Error starting server:", error);
+    console.log("test")
   }
 };
 
