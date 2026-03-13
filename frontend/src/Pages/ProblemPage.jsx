@@ -179,6 +179,7 @@ import OutputPanel from "../components/OutputPanel";
 import { executeCode } from "../lib/judge0"; // judge0 executor
 import toast from "react-hot-toast";
 import confetti from "canvas-confetti";
+import { useActiveSessions } from "../hooks/useSessions";
 
 const ProblemPage = () => {
   const { id } = useParams();
@@ -194,6 +195,8 @@ const ProblemPage = () => {
 
   const [output, setOutput] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
+
+  
 
   const currentProblem = PROBLEMS[currentProblemId];
 
@@ -250,39 +253,6 @@ const ProblemPage = () => {
 
     return normalizedActual === normalizedExpected;
   };
-
-  //   const handleRunCode = async () => {
-  //     setIsRunning(true);
-  //     setOutput(null);
-
-  //     try {
-  //       const result = await executeCode(selectedLanguage, code);
-
-  //       if (result.success) {
-  //         setOutput(result.output);
-
-  //         const expectedOutput = currentProblem.expectedOutput[selectedLanguage];
-
-  //         const testPassed = checkIfTestsPassed(result.output, expectedOutput);
-
-  //         if (testPassed) {
-  //           triggerConfetti();
-  //           toast.success("🎉 Congratulations! All test cases passed");
-  //           triggerConfetti();
-  //         } else {
-  //           toast.error("❌ Failed! Check your code");
-  //         }
-  //       } else {
-  //         setOutput(result.error);
-  //         toast.error("Code execution failed");
-  //       }
-  //     } catch (error) {
-  //       setOutput(error.message);
-  //       toast.error("Something went wrong");
-  //     }
-
-  //     setIsRunning(false);
-  //   };
 
   const handleRunCode = async () => {
     setIsRunning(true);
