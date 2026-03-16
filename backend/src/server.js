@@ -10,12 +10,35 @@ import sessionRoutes from "./routes/sessionRoutes.js";
 
 const app = express();
 const PORT = ENV.PORT || 3000;
+const allowedOrigins = ENV.CLIENT_URL?.split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+const localOriginPattern = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i;
+
 // this add req.auth and req.session to the request object, allowing us to access the authenticated user's information in our routes and functions
 app.use(clerkMiddleware());
 app.use(express.json());
 app.use(
   cors({
-    origin: ENV.CLIENT_URL,
+    origin: (origin, callback) => {
+      if (
+        !origin ||
+        !allowedOrigins?.length ||
+        allowedOrigins.includes(origin)
+      ) {
+        return callback(null, true);
+      }
+
+      const hasOnlyLocalOrigins = allowedOrigins.every((allowedOrigin) =>
+        localOriginPattern.test(allowedOrigin),
+      );
+
+      if (hasOnlyLocalOrigins) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
   }),
 );
@@ -39,7 +62,6 @@ const startServer = async () => {
     });
   } catch (error) {
     console.error("Error starting server:", error);
-    console.log("test")
   }
 };
 
