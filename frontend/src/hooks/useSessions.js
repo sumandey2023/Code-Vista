@@ -51,12 +51,12 @@ export const useSessionById = (id) => {
   return result;
 };
 
-export const useJoinSession = (id) => {
+export const useJoinSession = () => {
   const { getToken } = useAuth();
 
   const result = useMutation({
     mutationKey: ["joinSession"],
-    mutationFn: async () => sessionApi.joinSession(id, await getToken()),
+    mutationFn: async (id) => sessionApi.joinSession(id, await getToken()),
     onSuccess: () => toast.success("Joined session successfully!"),
     onError: (error) =>
       toast.error(error.response?.data?.message || "Failed to join session!"),
@@ -64,12 +64,12 @@ export const useJoinSession = (id) => {
   return result;
 };
 
-export const useEndSession = (id) => {
+export const useEndSession = () => {
   const { getToken } = useAuth();
 
   const result = useMutation({
     mutationKey: ["endSession"],
-    mutationFn: async () => sessionApi.endSession(id, await getToken()),
+    mutationFn: async (id) => sessionApi.endSession(id, await getToken()),
     onSuccess: () => toast.success("Session ended successfully!"),
     onError: (error) =>
       toast.error(error.response?.data?.message || "Failed to end session!"),
