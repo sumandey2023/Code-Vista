@@ -1,23 +1,65 @@
 import { chatClient, streamClient } from "../lib/stream.js";
+import crypto from "crypto";
 import Session from "../models/Session.js";
+
+const PASSWORD_KEYLEN = 64;
+
+function hashSessionPassword(password) {
+  const salt = crypto.randomBytes(16).toString("hex");
+  const hash = crypto
+    .scryptSync(password, salt, PASSWORD_KEYLEN)
+    .toString("hex");
+  return `${salt}:${hash}`;
+}
+
+function verifySessionPassword(password, storedPasswordHash) {
+  if (!storedPasswordHash || !password) return false;
+
+  const [salt, storedHash] = storedPasswordHash.split(":");
+  if (!salt || !storedHash) return false;
+
+  const hashBuffer = crypto.scryptSync(password, salt, PASSWORD_KEYLEN);
+  const storedHashBuffer = Buffer.from(storedHash, "hex");
+
+  if (hashBuffer.length !== storedHashBuffer.length) return false;
+
+  return crypto.timingSafeEqual(hashBuffer, storedHashBuffer);
+}
+
+function sanitizeSession(sessionDoc) {
+  const session = sessionDoc.toObject
+    ? sessionDoc.toObject()
+    : { ...sessionDoc };
+  session.isPasswordProtected = Boolean(session.sessionPassword);
+  delete session.sessionPassword;
+  return session;
+}
 
 export async function createSession(req, res) {
   try {
-    const { problem, difficulty } = req.body;
+    const { problem, difficulty, sessionPassword } = req.body;
     const userId = req.user._id;
     const clerkId = req.user.clerkId;
 
-    if (!problem || !difficulty) {
+    if (!problem || !difficulty || !sessionPassword) {
       return res
         .status(400)
-        .json({ error: "Problem and difficulty are required" });
+        .json({ error: "Problem, difficulty, and room password are required" });
     }
+
+    if (sessionPassword.trim().length < 4) {
+      return res
+        .status(400)
+        .json({ message: "Room password must be at least 4 characters" });
+    }
+
     const callId = `session_${Date.now()}_${Math.random().toString(36).substring(7)}`;
     const session = await Session.create({
       problem,
       difficulty,
       host: userId,
       callId,
+      sessionPassword: hashSessionPassword(sessionPassword.trim()),
     });
 
     await streamClient.video.call("default", callId).getOrCreate({
@@ -37,7 +79,7 @@ export async function createSession(req, res) {
       members: [clerkId],
     });
     await channel.create();
-    res.status(201).json({ session });
+    res.status(201).json({ session: sanitizeSession(session) });
   } catch (error) {
     console.error("Error", error.message);
     res.status(500).json({ message: "Internal server error" });
@@ -47,11 +89,12 @@ export async function createSession(req, res) {
 export async function getActiveSessions(_, res) {
   try {
     const sessions = await Session.find({ status: "active" })
+      .select("+sessionPassword")
       .populate("host", "name profileImage email clerkId")
       .populate("participant", "name profileImage email clerkId")
       .sort({ createdAt: -1 })
       .limit(20);
-    res.status(200).json({ sessions });
+    res.status(200).json({ sessions: sessions.map(sanitizeSession) });
   } catch (error) {
     console.error("Error", error.message);
     res.status(500).json({ message: "Internal server error" });
@@ -80,12 +123,13 @@ export async function getSessionById(req, res) {
   try {
     const { id } = req.params;
     const session = await Session.findById(id)
+      .select("+sessionPassword")
       .populate("host", "name profileImage email clerkId")
       .populate("participant", "name profileImage email clerkId");
     if (!session) {
       return res.status(404).json({ message: "Session not found" });
     }
-    res.status(200).json({ session });
+    res.status(200).json({ session: sanitizeSession(session) });
   } catch (error) {
     console.error("Error", error.message);
     res.status(500).json({ message: "Internal server error" });
@@ -95,9 +139,10 @@ export async function getSessionById(req, res) {
 export async function joinSession(req, res) {
   try {
     const { id } = req.params;
+    const { sessionPassword } = req.body;
     const userId = req.user._id;
     const clerkId = req.user.clerkId;
-    const session = await Session.findById(id);
+    const session = await Session.findById(id).select("+sessionPassword");
     if (!session) {
       return res.status(404).json({ message: "Session not found" });
     }
@@ -113,6 +158,16 @@ export async function joinSession(req, res) {
         .json({ message: "Host cannot join as participant" });
     }
 
+    if (
+      session.sessionPassword &&
+      !verifySessionPassword(
+        (sessionPassword || "").trim(),
+        session.sessionPassword,
+      )
+    ) {
+      return res.status(401).json({ message: "Invalid room password" });
+    }
+
     if (session.participant) {
       return res.status(409).json({ message: "Session is already full" });
     }
@@ -120,7 +175,7 @@ export async function joinSession(req, res) {
     await session.save();
     const channel = chatClient.channel("messaging", session.callId);
     await channel.addMembers([clerkId]);
-    res.status(200).json({ session });
+    res.status(200).json({ session: sanitizeSession(session) });
   } catch (error) {
     console.error("Error", error.message);
     res.status(500).json({ message: "Internal server error" });
