@@ -38,10 +38,10 @@ export const sessionApi = {
     );
     return response.data;
   },
-  joinSession: async (id, token) => {
+  joinSession: async (id, sessionPassword, token) => {
     const response = await axiosInstance.post(
       `/session/${id}/join`,
-      {},
+      { sessionPassword },
       getAuthConfig(token),
     );
     return response.data;

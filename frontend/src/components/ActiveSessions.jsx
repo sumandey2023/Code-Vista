@@ -2,6 +2,9 @@ import {
   ArrowRightIcon,
   Code2Icon,
   CrownIcon,
+  LockIcon,
+  RefreshCwIcon,
+  SearchIcon,
   SparklesIcon,
   UsersIcon,
   ZapIcon,
@@ -10,10 +13,21 @@ import {
 import { Link } from "react-router";
 import { getDifficultyBadgeClass } from "../lib/utils";
 
-const ActiveSessions = ({ sessions, isLoading, isUserInSession }) => {
+const ActiveSessions = ({
+  sessions,
+  isLoading,
+  isUserInSession,
+  title = "Live Sessions",
+  emptyMessage = "Be the first to create one!",
+  searchQuery = "",
+  onSearchChange,
+  onRefresh,
+  isRefreshing = false,
+  showSessionCount = true,
+}) => {
   return (
     <div
-      className="lg:col-span-2 relative rounded-2xl border border-green-500/20 bg-gray-900/60 backdrop-blur-sm overflow-hidden transition-all duration-300 hover:border-green-500/40"
+      className="relative rounded-2xl border border-green-500/20 bg-gray-900/60 backdrop-blur-sm overflow-hidden transition-all duration-300 hover:border-green-500/40"
       style={{ boxShadow: "0 0 30px rgba(0,0,0,0.3)" }}
     >
       {/* Top glow line */}
@@ -42,25 +56,57 @@ const ActiveSessions = ({ sessions, isLoading, isUserInSession }) => {
             <h2
               className="text-2xl font-black"
               style={{
-                background: "linear-gradient(135deg, #4ade80, #22c55e, #16a34a)",
+                background:
+                  "linear-gradient(135deg, #4ade80, #22c55e, #16a34a)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 backgroundClip: "text",
               }}
             >
-              Live Sessions
+              {title}
             </h2>
           </div>
 
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-green-500/40 bg-green-500/10 text-green-400 text-xs font-semibold">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-            {sessions.length} active
-          </div>
+          {showSessionCount && (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-green-500/40 bg-green-500/10 text-green-400 text-xs font-semibold">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+              {sessions.length} active
+            </div>
+          )}
         </div>
+
+        {(onSearchChange || onRefresh) && (
+          <div className="flex flex-col sm:flex-row gap-3 mb-5">
+            {onSearchChange && (
+              <div className="relative flex-1">
+                <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-green-500/80" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => onSearchChange(e.target.value)}
+                  placeholder="Search by Session ID"
+                  className="w-full pl-9 pr-3 py-2.5 rounded-xl text-sm text-green-300 border border-green-500/25 bg-gray-950/70 focus:outline-none focus:border-green-500/50"
+                />
+              </div>
+            )}
+
+            {onRefresh && (
+              <button
+                onClick={onRefresh}
+                disabled={isRefreshing}
+                className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border border-green-500/30 bg-gray-950/70 text-green-300 hover:border-green-500/50 disabled:opacity-60"
+              >
+                <RefreshCwIcon
+                  className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`}
+                />
+                Refresh
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Sessions list */}
         <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
-
           {/* Loading */}
           {isLoading && (
             <div className="flex items-center justify-center py-20">
@@ -69,7 +115,8 @@ const ActiveSessions = ({ sessions, isLoading, isUserInSession }) => {
           )}
 
           {/* Sessions */}
-          {!isLoading && sessions.length > 0 &&
+          {!isLoading &&
+            sessions.length > 0 &&
             sessions.map((session) => (
               <div
                 key={session._id}
@@ -100,7 +147,8 @@ const ActiveSessions = ({ sessions, isLoading, isUserInSession }) => {
                         <Code2Icon className="size-5 text-green-400" />
                       </div>
                       {/* Live dot */}
-                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-gray-950"
+                      <div
+                        className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-gray-950"
                         style={{ boxShadow: "0 0 6px rgba(34,197,94,0.8)" }}
                       />
                     </div>
@@ -111,7 +159,9 @@ const ActiveSessions = ({ sessions, isLoading, isUserInSession }) => {
                         <h3 className="font-bold text-white truncate">
                           {session.problem}
                         </h3>
-                        <span className={`badge badge-sm ${getDifficultyBadgeClass(session.difficulty)}`}>
+                        <span
+                          className={`badge badge-sm ${getDifficultyBadgeClass(session.difficulty)}`}
+                        >
                           {session.difficulty.slice(0, 1).toUpperCase() +
                             session.difficulty.slice(1)}
                         </span>
@@ -128,6 +178,12 @@ const ActiveSessions = ({ sessions, isLoading, isUserInSession }) => {
                           <UsersIcon className="size-3" />
                           <span>{session.participant ? "2/2" : "1/2"}</span>
                         </div>
+                        {session.isPasswordProtected && (
+                          <div className="flex items-center gap-1 text-amber-400">
+                            <LockIcon className="size-3" />
+                            <span>Protected</span>
+                          </div>
+                        )}
                         {session.participant && !isUserInSession(session) ? (
                           <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border border-red-500/40 bg-red-500/10 text-red-400">
                             FULL
@@ -159,7 +215,9 @@ const ActiveSessions = ({ sessions, isLoading, isUserInSession }) => {
                         boxShadow: "0 0 16px rgba(34,197,94,0.3)",
                       }}
                     >
-                      <span>{isUserInSession(session) ? "Rejoin" : "Join"}</span>
+                      <span>
+                        {isUserInSession(session) ? "Rejoin" : "Join"}
+                      </span>
                       <ArrowRightIcon className="size-4 group-hover/btn:translate-x-0.5 transition-transform" />
                       <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-in-out" />
                     </Link>
@@ -181,12 +239,13 @@ const ActiveSessions = ({ sessions, isLoading, isUserInSession }) => {
                 <SparklesIcon className="w-8 h-8 text-green-500/30" />
               </div>
               <div className="text-center">
-                <p className="text-white font-semibold mb-1">No active sessions</p>
-                <p className="text-sm text-gray-600">Be the first to create one!</p>
+                <p className="text-white font-semibold mb-1">
+                  No active sessions
+                </p>
+                <p className="text-sm text-gray-600">{emptyMessage}</p>
               </div>
             </div>
           )}
-
         </div>
       </div>
     </div>

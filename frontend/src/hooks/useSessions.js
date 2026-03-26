@@ -56,7 +56,8 @@ export const useJoinSession = () => {
 
   const result = useMutation({
     mutationKey: ["joinSession"],
-    mutationFn: async (id) => sessionApi.joinSession(id, await getToken()),
+    mutationFn: async ({ id, sessionPassword }) =>
+      sessionApi.joinSession(id, sessionPassword, await getToken()),
     onSuccess: () => toast.success("Joined session successfully!"),
     onError: (error) =>
       toast.error(error.response?.data?.message || "Failed to join session!"),
