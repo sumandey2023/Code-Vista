@@ -10,9 +10,10 @@ const LANGUAGE_IDS = {
  * Execute code using Judge0 API
  * @param {string} language
  * @param {string} code
+ * @param {string} stdin - User input (optional)
  * @returns {Promise<{success:boolean, output?:string, error?:string}>}
  */
-export async function executeCode(language, code) {
+export async function executeCode(language, code, stdin = "") {
   try {
     const languageId = LANGUAGE_IDS[language];
 
@@ -33,7 +34,7 @@ export async function executeCode(language, code) {
         body: JSON.stringify({
           source_code: code,
           language_id: languageId,
-          stdin: "",
+          stdin: stdin,
         }),
       },
     );

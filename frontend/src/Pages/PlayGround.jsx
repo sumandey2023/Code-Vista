@@ -3,6 +3,7 @@ import MainNav from "../components/MainNav";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import PlayGroundCodeEditor from "../components/PlayGroundCodeEditor";
 import PlayGroundOutput from "../components/PlayGroundOutput";
+import PlayGroundInput from "../components/PlayGroundInput";
 import { executeCode } from "../lib/judge0";
 import { LANGUAGE_CONFIG } from "../data/problems";
 
@@ -11,6 +12,7 @@ const PlayGround = () => {
   const [code, setCode] = useState(LANGUAGE_CONFIG.javascript.boilerplate);
   const [output, setOutput] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
+  const [userInput, setUserInput] = useState("");
 
   // Handle language change and reset code to boilerplate
   const handleLanguageChange = useCallback((newLanguage) => {
@@ -24,15 +26,15 @@ const PlayGround = () => {
     setCode(newCode);
   }, []);
 
-  // Handle running code
+  // Handle running code with user input
   const handleRunCode = useCallback(async () => {
     setIsRunning(true);
     setOutput(null);
 
-    const result = await executeCode(selectedLanguage, code);
+    const result = await executeCode(selectedLanguage, code, userInput);
     setOutput(result);
     setIsRunning(false);
-  }, [selectedLanguage, code]);
+  }, [selectedLanguage, code, userInput]);
 
   return (
     <div className="h-screen flex flex-col overflow-hidden relative">
@@ -63,35 +65,44 @@ const PlayGround = () => {
 
       <div className="relative z-10 flex-1 overflow-hidden">
         <PanelGroup direction="horizontal" className="h-full">
-          <Panel
-            defaultSize={100}
-            minSize={100}
-            className="h-full overflow-hidden"
-          >
+          {/* Editor Panel */}
+          <Panel defaultSize={50} minSize={30} className="overflow-hidden">
+            <div className="h-full bg-gray-900/60 backdrop-blur-sm border border-green-500/15">
+              <PlayGroundCodeEditor
+                selectedLanguage={selectedLanguage}
+                code={code}
+                isRunning={isRunning}
+                onLanguageChange={handleLanguageChange}
+                onCodeChange={handleCodeChange}
+                onRunCode={handleRunCode}
+              />
+            </div>
+          </Panel>
+
+          <PanelResizeHandle className="w-1.5 bg-green-500/10 hover:bg-green-500/40 cursor-col-resize" />
+
+          {/* Output and Input Panels */}
+          <Panel defaultSize={50} minSize={30} className="overflow-hidden">
             <PanelGroup direction="vertical" className="h-full">
-              {/* Editor */}
-              <Panel defaultSize={60} minSize={30} className="overflow-hidden">
+              {/* Output */}
+              <Panel defaultSize={50} minSize={20} className="overflow-hidden">
                 <div className="h-full bg-gray-900/60 backdrop-blur-sm border border-green-500/15">
-                  <PlayGroundCodeEditor
-                    selectedLanguage={selectedLanguage}
-                    code={code}
+                  <PlayGroundOutput
+                    output={output}
                     isRunning={isRunning}
-                    onLanguageChange={handleLanguageChange}
-                    onCodeChange={handleCodeChange}
-                    onRunCode={handleRunCode}
+                    testPassed={null}
                   />
                 </div>
               </Panel>
 
               <PanelResizeHandle className="h-1.5 bg-green-500/10 hover:bg-green-500/40 cursor-row-resize" />
 
-              {/* Output */}
-              <Panel defaultSize={40} minSize={20} className="overflow-hidden">
+              {/* Input */}
+              <Panel defaultSize={50} minSize={20} className="overflow-hidden">
                 <div className="h-full bg-gray-900/60 backdrop-blur-sm border-t border-green-500/15">
-                  <PlayGroundOutput
-                    output={output}
-                    isRunning={isRunning}
-                    testPassed={null}
+                  <PlayGroundInput
+                    userInput={userInput}
+                    onInputChange={setUserInput}
                   />
                 </div>
               </Panel>
