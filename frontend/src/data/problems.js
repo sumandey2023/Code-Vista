@@ -80,7 +80,9 @@ class Main {
     category: "String • Two Pointers",
     description: {
       text: "Write a function that reverses a string. The input string is given as an array of characters s.",
-      notes: ["You must do this by modifying the input array in-place with O(1) extra memory."],
+      notes: [
+        "You must do this by modifying the input array in-place with O(1) extra memory.",
+      ],
     },
     examples: [
       {
@@ -152,7 +154,9 @@ class Main {
     category: "String • Two Pointers",
     description: {
       text: "A phrase is a palindrome if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward. Alphanumeric characters include letters and numbers.",
-      notes: ["Given a string s, return true if it is a palindrome, or false otherwise."],
+      notes: [
+        "Given a string s, return true if it is a palindrome, or false otherwise.",
+      ],
     },
     examples: [
       {
@@ -172,7 +176,10 @@ class Main {
           's is an empty string "" after removing non-alphanumeric characters. Since an empty string reads the same forward and backward, it is a palindrome.',
       },
     ],
-    constraints: ["1 ≤ s.length ≤ 2 * 10⁵", "s consists only of printable ASCII characters"],
+    constraints: [
+      "1 ≤ s.length ≤ 2 * 10⁵",
+      "s consists only of printable ASCII characters",
+    ],
     starterCode: {
       javascript: `function isPalindrome(s) {
   // Write your solution here
@@ -378,7 +385,7 @@ print(maxArea([1,1]))  # Expected: 1`,
 //     starterCode: {
 //       javascript: `function twoSum(nums, target) {
 //   // Write your solution here
-  
+
 // }
 
 // // Test cases
@@ -534,15 +541,24 @@ export const LANGUAGE_CONFIG = {
     name: "JavaScript",
     icon: "/javascript.png",
     monacoLang: "javascript",
+    boilerplate: 'console.log("Hello World");',
   },
   python: {
     name: "Python",
     icon: "/python.png",
     monacoLang: "python",
+    boilerplate: 'print("Hello World")',
   },
   java: {
     name: "Java",
     icon: "/java.png",
     monacoLang: "java",
+    boilerplate: `import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello World");
+    }
+}`,
   },
 };

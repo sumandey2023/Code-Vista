@@ -6,6 +6,7 @@ import HomePage from "./Pages/HomePage";
 import ProblemPage from "./Pages/ProblemPage";
 import ProblemsPage from "./Pages/ProblemsPage";
 import SessionPage from "./Pages/SessionPage";
+import PlayGround from "./Pages/PlayGround";
 
 const Router = () => {
   const { isSignedIn, isLoaded } = useAuth();
@@ -34,6 +35,10 @@ const Router = () => {
       <Route
         path="/session/:id"
         element={isSignedIn ? <SessionPage /> : <Navigate to={"/"} />}
+      />
+      <Route
+        path="/playground"
+        element={isSignedIn ? <PlayGround /> : <Navigate to={"/"} />}
       />
     </Routes>
   );
