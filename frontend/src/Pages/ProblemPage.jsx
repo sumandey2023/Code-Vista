@@ -179,7 +179,8 @@ import OutputPanel from "../components/OutputPanel";
 import { executeCode } from "../lib/judge0"; // judge0 executor
 import toast from "react-hot-toast";
 import confetti from "canvas-confetti";
-import { useActiveSessions } from "../hooks/useSessions";
+import { aiApi } from "../api/ai";
+import AIExplainPanel from "../components/AIExplainPanel";
 
 const ProblemPage = () => {
   const { id } = useParams();
@@ -195,16 +196,38 @@ const ProblemPage = () => {
 
   const [output, setOutput] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
-
-  
-
+  const [isExplaining, setIsExplaining] = useState(false);
+  const [isGeneratingCode, setIsGeneratingCode] = useState(false);
+  const [aiPanelOpen, setAiPanelOpen] = useState(false);
+  const [explanation, setExplanation] = useState(null);
   const currentProblem = PROBLEMS[currentProblemId];
+
+  const getProblemPayload = () => {
+    const descriptionText = [
+      currentProblem.description?.text,
+      ...(currentProblem.description?.notes || []),
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    return {
+      problemId: currentProblem.id,
+      title: currentProblem.title,
+      description: descriptionText,
+      examples: currentProblem.examples || [],
+      constraints: currentProblem.constraints || [],
+      selectedLanguage,
+      currentCode: code,
+    };
+  };
 
   useEffect(() => {
     if (id && PROBLEMS[id]) {
       setCurrentProblemId(id);
       setCode(PROBLEMS[id].starterCode[selectedLanguage]);
       setOutput(null);
+      setExplanation(null);
+      setIsGeneratingCode(false);
     }
   }, [id, selectedLanguage]);
 
@@ -213,6 +236,8 @@ const ProblemPage = () => {
     setSelectedLanguage(newLang);
     setCode(currentProblem.starterCode[newLang]);
     setOutput(null);
+    setExplanation(null);
+    setIsGeneratingCode(false);
   };
 
   const handleProblemChange = (newProblemId) =>
@@ -291,6 +316,65 @@ const ProblemPage = () => {
     setIsRunning(false);
   };
 
+  const generateExplanation = async () => {
+    if (isExplaining) {
+      return;
+    }
+
+    setIsExplaining(true);
+
+    try {
+      const response = await aiApi.explainProblem(getProblemPayload());
+
+      if (!response?.success || !response?.data) {
+        throw new Error(response?.message || "Failed to generate explanation");
+      }
+
+      setExplanation(response.data);
+      toast.success("AI explanation generated");
+    } catch (error) {
+      toast.error(error?.message || "Failed to generate explanation");
+    } finally {
+      setIsExplaining(false);
+    }
+  };
+
+  const handleExplainCode = async () => {
+    setAiPanelOpen(true);
+
+    if (!explanation) {
+      await generateExplanation();
+    }
+  };
+
+  const handleRegenerateExplanation = async () => {
+    setAiPanelOpen(true);
+    await generateExplanation();
+  };
+
+  const handleGenerateFullCode = async () => {
+    if (isGeneratingCode) {
+      return;
+    }
+
+    setIsGeneratingCode(true);
+
+    try {
+      const response = await aiApi.generateFullCode(getProblemPayload());
+
+      if (!response?.success || !response?.data?.code) {
+        throw new Error(response?.message || "Failed to generate full code");
+      }
+
+      setCode(response.data.code);
+      toast.success("Full code generated and inserted in editor");
+    } catch (error) {
+      toast.error(error?.message || "Failed to generate full code");
+    } finally {
+      setIsGeneratingCode(false);
+    }
+  };
+
   return (
     <div className="h-screen flex flex-col overflow-hidden relative">
       {/* Grid background */}
@@ -314,7 +398,7 @@ const ProblemPage = () => {
       />
 
       {/* Navbar */}
-      <div className="relative z-10 flex-shrink-0">
+      <div className="relative z-10 shrink-0">
         <MainNav />
       </div>
 
@@ -345,33 +429,68 @@ const ProblemPage = () => {
             minSize={30}
             className="h-full overflow-hidden"
           >
-            <PanelGroup direction="vertical" className="h-full">
-              {/* Editor */}
-              <Panel defaultSize={70} minSize={30} className="overflow-hidden">
-                <div className="h-full bg-gray-900/60 backdrop-blur-sm border border-green-500/15">
-                  <CodeEditorPanel
-                    selectedLanguage={selectedLanguage}
-                    code={code}
-                    isRunning={isRunning}
-                    onLanguageChange={handleLanguageChange}
-                    onCodeChange={setCode}
-                    onRunCode={handleRunCode}
-                  />
-                </div>
+            <PanelGroup direction="horizontal" className="h-full">
+              <Panel defaultSize={aiPanelOpen ? 65 : 100} minSize={35}>
+                <PanelGroup direction="vertical" className="h-full">
+                  {/* Editor */}
+                  <Panel
+                    defaultSize={70}
+                    minSize={30}
+                    className="overflow-hidden"
+                  >
+                    <div className="h-full bg-gray-900/60 backdrop-blur-sm border border-green-500/15 overflow-hidden">
+                      <div className="h-full">
+                        <CodeEditorPanel
+                          selectedLanguage={selectedLanguage}
+                          code={code}
+                          isRunning={isRunning}
+                          isExplaining={isExplaining}
+                          isGeneratingCode={isGeneratingCode}
+                          onLanguageChange={handleLanguageChange}
+                          onCodeChange={setCode}
+                          onRunCode={handleRunCode}
+                          onExplainCode={handleExplainCode}
+                        />
+                      </div>
+                    </div>
+                  </Panel>
+
+                  <PanelResizeHandle className="h-1.5 bg-green-500/10 hover:bg-green-500/40 cursor-row-resize" />
+
+                  {/* Output */}
+                  <Panel
+                    defaultSize={30}
+                    minSize={20}
+                    className="overflow-hidden"
+                  >
+                    <div className="h-full bg-gray-900/60 backdrop-blur-sm border-t border-green-500/15">
+                      <OutputPanel
+                        output={output}
+                        isRunning={isRunning}
+                        testPassed={testPassed}
+                      />
+                    </div>
+                  </Panel>
+                </PanelGroup>
               </Panel>
 
-              <PanelResizeHandle className="h-1.5 bg-green-500/10 hover:bg-green-500/40 cursor-row-resize" />
-
-              {/* Output */}
-              <Panel defaultSize={30} minSize={20} className="overflow-hidden">
-                <div className="h-full bg-gray-900/60 backdrop-blur-sm border-t border-green-500/15">
-                  <OutputPanel
-                    output={output}
-                    isRunning={isRunning}
-                    testPassed={testPassed}
-                  />
-                </div>
-              </Panel>
+              {aiPanelOpen && (
+                <>
+                  <PanelResizeHandle className="w-1.5 bg-blue-500/10 hover:bg-blue-500/40 cursor-col-resize" />
+                  <Panel defaultSize={35} minSize={22}>
+                    <div className="h-full border-l border-blue-500/20 bg-slate-900/70 backdrop-blur-sm">
+                      <AIExplainPanel
+                        isExplaining={isExplaining}
+                        isGeneratingCode={isGeneratingCode}
+                        explanation={explanation}
+                        onClose={() => setAiPanelOpen(false)}
+                        onRegenerate={handleRegenerateExplanation}
+                        onGenerateFullCode={handleGenerateFullCode}
+                      />
+                    </div>
+                  </Panel>
+                </>
+              )}
             </PanelGroup>
           </Panel>
         </PanelGroup>
