@@ -1,14 +1,17 @@
 import Editor from "@monaco-editor/react";
-import { Loader2Icon, PlayIcon } from "lucide-react";
+import { Loader2Icon, PlayIcon, SparklesIcon } from "lucide-react";
 import { LANGUAGE_CONFIG } from "../data/problems";
 
 function CodeEditorPanel({
   selectedLanguage,
   code,
   isRunning,
+  isExplaining,
+  isGeneratingCode,
   onLanguageChange,
   onCodeChange,
   onRunCode,
+  onExplainCode,
 }) {
   return (
     <div className="h-full flex flex-col overflow-hidden relative">
@@ -23,7 +26,7 @@ function CodeEditorPanel({
 
       {/* Toolbar */}
       <div
-        className="flex-shrink-0 flex items-center justify-between px-4 py-3 border-b border-green-500/20 relative z-10"
+        className="shrink-0 flex items-center justify-between px-4 py-3 border-b border-green-500/20 relative z-10"
         style={{
           background:
             "linear-gradient(135deg, rgba(34,197,94,0.07), rgba(22,163,74,0.03))",
@@ -33,7 +36,7 @@ function CodeEditorPanel({
         {/* Language selector */}
         <div className="flex items-center gap-3">
           <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center border border-green-500/30 flex-shrink-0"
+            className="w-8 h-8 rounded-lg flex items-center justify-center border border-green-500/30 shrink-0"
             style={{
               background:
                 "linear-gradient(135deg, rgba(34,197,94,0.15), rgba(22,163,74,0.05))",
@@ -61,36 +64,57 @@ function CodeEditorPanel({
           </select>
         </div>
 
-        {/* Run button */}
-        <button
-          disabled={isRunning}
-          onClick={onRunCode}
-          className="group relative inline-flex items-center gap-2 px-5 py-2 rounded-full font-bold text-sm text-black overflow-hidden transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
-          style={{
-            background: isRunning
-              ? "linear-gradient(135deg, #16a34a, #15803d)"
-              : "linear-gradient(135deg, #4ade80, #16a34a)",
-            boxShadow: isRunning ? "none" : "0 0 20px rgba(34,197,94,0.35)",
-          }}
-        >
-          {isRunning ? (
-            <>
-              <Loader2Icon className="size-4 animate-spin" />
-              <span>Running...</span>
-            </>
-          ) : (
-            <>
-              <PlayIcon className="size-4 group-hover:scale-110 transition-transform" />
-              <span>Run Code</span>
-              {/* shimmer */}
-              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
-            </>
-          )}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            disabled={isExplaining || isGeneratingCode}
+            onClick={onExplainCode}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold text-blue-100 border border-blue-400/45 bg-blue-500/10 hover:bg-blue-500/20 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {isExplaining ? (
+              <>
+                <Loader2Icon className="size-4 animate-spin" />
+                <span>Explaining...</span>
+              </>
+            ) : (
+              <>
+                <SparklesIcon className="size-4" />
+                <span>AI Explain</span>
+              </>
+            )}
+          </button>
+
+          {/* Run button */}
+          <button
+            disabled={isRunning || isGeneratingCode}
+            onClick={onRunCode}
+            className="group relative inline-flex items-center gap-2 px-5 py-2 rounded-full font-bold text-sm text-black overflow-hidden transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+            style={{
+              background: isRunning
+                ? "linear-gradient(135deg, #16a34a, #15803d)"
+                : "linear-gradient(135deg, #4ade80, #16a34a)",
+              boxShadow: isRunning ? "none" : "0 0 20px rgba(34,197,94,0.35)",
+            }}
+          >
+            {isRunning ? (
+              <>
+                <Loader2Icon className="size-4 animate-spin" />
+                <span>Running...</span>
+              </>
+            ) : (
+              <>
+                <PlayIcon className="size-4 group-hover:scale-110 transition-transform" />
+                <span>Run Code</span>
+                {/* shimmer */}
+                <span className="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Editor */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden relative">
         <Editor
           height="100%"
           language={LANGUAGE_CONFIG[selectedLanguage].monacoLang}
@@ -112,8 +136,28 @@ function CodeEditorPanel({
             lineHeight: 1.7,
             renderLineHighlight: "all",
             bracketPairColorization: { enabled: true },
+            readOnly: isGeneratingCode,
           }}
         />
+
+        {isGeneratingCode && (
+          <div className="absolute inset-0 z-20 bg-slate-950/75 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3">
+            <div className="flex gap-1.5">
+              {[0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="w-2.5 h-2.5 rounded-full bg-emerald-400"
+                  style={{
+                    animation: `codePulse 0.9s ease-in-out ${i * 0.15}s infinite`,
+                  }}
+                />
+              ))}
+            </div>
+            <p className="text-sm font-semibold text-emerald-300">
+              Generating full code in editor...
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Bottom glow line */}
@@ -124,6 +168,13 @@ function CodeEditorPanel({
             "linear-gradient(90deg, transparent, rgba(34,197,94,0.3), transparent)",
         }}
       />
+
+      <style>{`
+        @keyframes codePulse {
+          0%, 100% { transform: translateY(0); opacity: 0.35; }
+          50% { transform: translateY(-6px); opacity: 1; }
+        }
+      `}</style>
     </div>
   );
 }
